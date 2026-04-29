@@ -84,17 +84,14 @@ def run_code_analyzer_broken(state):
     files = state.get("files_changed", [])
     query = f"Analyze ALL files for bugs including legacy_module.py: {files + ['legacy_module.py']}"
 
-    try:
-        result = agent.invoke({
-            "messages": [
-                SystemMessage(content="You are a code analyzer. Read ALL files including legacy_module.py."),
-                {"role": "user", "content": query},
-            ]
-        })
-        response = result["messages"][-1].content
-        return {"code_issues": [{"description": response, "severity": "medium"}]}
-    except Exception as e:
-        return {"code_issues": [{"description": f"AGENT CRASHED: {e}", "severity": "critical"}]}
+    result = agent.invoke({
+        "messages": [
+            SystemMessage(content="You are a code analyzer. Read ALL files including legacy_module.py."),
+            {"role": "user", "content": query},
+        ]
+    })
+    response = result["messages"][-1].content
+    return {"code_issues": [{"description": response, "severity": "medium"}]}
 
 
 # Parallel fan-out graph with broken code_analyzer

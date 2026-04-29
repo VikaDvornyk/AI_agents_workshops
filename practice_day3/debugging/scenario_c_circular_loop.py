@@ -50,9 +50,7 @@ def run_code_analyzer_looping(state):
     _call_count += 1
 
     if _call_count > MAX_CALLS:
-        return {
-            "code_issues": [{"description": f"Stopped after {_call_count} iterations.", "severity": "critical"}],
-        }
+        raise RecursionError(f"Circular dependency: code_analyzer ↔ standards_agent looped {_call_count}× before bailout.")
 
     print(f"  Code Analyzer called (iteration {_call_count})...")
 
@@ -71,9 +69,7 @@ def run_standards_agent_looping(state):
     _call_count += 1
 
     if _call_count > MAX_CALLS:
-        return {
-            "standards_report": {"violations": [{"description": f"Stopped after {_call_count} iterations."}]},
-        }
+        raise RecursionError(f"Circular dependency: standards_agent ↔ code_analyzer looped {_call_count}× before bailout.")
 
     print(f"  Standards Agent called (iteration {_call_count})...")
 
