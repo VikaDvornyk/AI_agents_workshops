@@ -11,6 +11,8 @@ build/
 .ruff_cache/
 .mypy_cache/
 
-practice_day3/
 practice_day1/TEACHER_NOTES.md
 practice_day2/TEACHER_NOTES.md
+practice_day3/TEACHER_NOTES.md
+
+practice_day2/faiss_index/

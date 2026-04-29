@@ -11,24 +11,23 @@ from config import KNOWLEDGE_BASE_PATH
 
 load_dotenv()
 
-# Step 1: Load documents
-loader = DirectoryLoader(
-    str(KNOWLEDGE_BASE_PATH),
-    glob="*.md",
-    loader_cls=TextLoader,
-)
-docs = loader.load()
+INDEX_PATH = KNOWLEDGE_BASE_PATH.parent / "faiss_index"
+embeddings = OpenAIEmbeddings()
 
-# Step 2: Split into chunks
-splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-chunks = splitter.split_documents(docs)
+if INDEX_PATH.exists():
+    # allow_dangerous_deserialization=True: FAISS uses pickle; we trust our own index file
+    vectorstore = FAISS.load_local(str(INDEX_PATH), embeddings, allow_dangerous_deserialization=True)
+else:
+    loader = DirectoryLoader(str(KNOWLEDGE_BASE_PATH), glob="*.md", loader_cls=TextLoader)
+    docs = loader.load()
+    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    chunks = splitter.split_documents(docs)
+    vectorstore = FAISS.from_documents(chunks, embeddings)
+    vectorstore.save_local(str(INDEX_PATH))
 
-# Step 3: Create vector store
-vectorstore = FAISS.from_documents(chunks, OpenAIEmbeddings())
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
 
-# Step 4: RAG tool
 @tool
 def search_knowledge_base(query: str) -> str:
     """Search the coding standards knowledge base.
@@ -45,8 +44,7 @@ def search_knowledge_base(query: str) -> str:
 
 # Quick test — run this file directly to verify RAG works
 if __name__ == "__main__":
-    print(f"Loaded {len(docs)} documents")
-    print(f"Split into {len(chunks)} chunks")
-    print(f"Vector store ready")
+    print(f"Index path: {INDEX_PATH}")
+    print(f"Vector store ready (cached: {INDEX_PATH.exists()})")
     print(f"\n--- Test search: 'error handling' ---\n")
     print(search_knowledge_base.invoke("error handling"))
