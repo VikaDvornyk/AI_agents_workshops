@@ -20,7 +20,6 @@ How to fix it:
   3. Code Analyzer should check for error keys before processing
 """
 
-import subprocess
 import sys
 from pathlib import Path
 
@@ -71,8 +70,17 @@ def get_file_content_broken(path: str) -> str:
 @tool
 def search_codebase(query: str) -> str:
     """Search the codebase."""
-    result = subprocess.run(["grep", "-rn", query, str(REPO_PATH)], capture_output=True, text=True)
-    return result.stdout if result.returncode == 0 else f"No matches for '{query}'"
+    matches = []
+    for f in REPO_PATH.rglob("*"):
+        if not f.is_file():
+            continue
+        try:
+            for i, line in enumerate(f.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+                if query in line:
+                    matches.append(f"{f}:{i}:{line}")
+        except OSError:
+            continue
+    return "\n".join(matches) if matches else f"No matches for '{query}'"
 
 
 def run_code_analyzer_broken(state):

@@ -23,7 +23,7 @@ def get_existing_tests(file_path: str) -> str:
     full_path = REPO_PATH / file_path
     if not full_path.exists():
         return f"Error: test file '{file_path}' not found."
-    return full_path.read_text()
+    return full_path.read_text(encoding="utf-8", errors="replace")
 
 
 @tool
@@ -37,7 +37,7 @@ def get_source_functions(file_path: str) -> str:
     if not full_path.exists():
         return f"Error: file '{file_path}' not found."
 
-    content = full_path.read_text()
+    content = full_path.read_text(encoding="utf-8", errors="replace")
     functions = re.findall(r"^(def \w+\(.*?\)).*:", content, re.MULTILINE)
     if not functions:
         return "No functions found."
@@ -59,8 +59,8 @@ def analyze_coverage(file_path: str) -> str:
     if not test_path.exists():
         return "Error: test file not found."
 
-    source = source_path.read_text()
-    tests = test_path.read_text()
+    source = source_path.read_text(encoding="utf-8", errors="replace")
+    tests = test_path.read_text(encoding="utf-8", errors="replace")
 
     functions = re.findall(r"^def (\w+)\(", source, re.MULTILINE)
     functions = [f for f in functions if not f.startswith("_")]

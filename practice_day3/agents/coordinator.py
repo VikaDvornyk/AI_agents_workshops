@@ -26,6 +26,8 @@ def get_pr_diff():
         ["git", "diff", "HEAD~3", "HEAD"],
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         cwd=REPO_PATH.parent,
     )
     return result.stdout or "No diff found."
@@ -42,6 +44,8 @@ def get_changed_files():
         ["git", "diff", "--name-only", "HEAD~3", "HEAD"],
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         cwd=REPO_PATH.parent,
     )
     all_files = [f.strip() for f in result.stdout.strip().split("\n") if f.strip()]

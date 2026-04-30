@@ -37,9 +37,11 @@ def search_codebase(query: str) -> str:
     Args:
         query: Search term — a function name, class name, keyword, or pattern
     """
-    # TODO: run `grep -rn {query} {REPO_PATH}` via subprocess and return the
-    #       matches. If there are none, return a clear "no matches" message
-    #       (otherwise the LLM will think the search failed).
+    # TODO: walk REPO_PATH with Path.rglob, read each file with
+    #       encoding="utf-8", errors="replace", and collect lines containing
+    #       `query` as "filepath:lineno:line". If there are none, return a
+    #       clear "no matches" message (otherwise the LLM thinks the search
+    #       failed). Use Python instead of `grep` so it works on Windows too.
     pass
 
 
@@ -54,6 +56,8 @@ def get_git_diff(commit_a: str, commit_b: str) -> str:
     """
     # TODO: run `git diff {commit_a} {commit_b}` via subprocess.
     #       Watch the working directory — it must be inside the git repo.
+    #       Pass encoding="utf-8", errors="replace" so non-ASCII bytes don't
+    #       crash on Windows (cp1252 default codepage).
     #       Return the diff output, or a "no differences" message if empty.
     pass
 

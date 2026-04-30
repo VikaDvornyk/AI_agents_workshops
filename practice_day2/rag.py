@@ -23,6 +23,8 @@ from config import KNOWLEDGE_BASE_PATH
 # TODO: Load all .md files from KNOWLEDGE_BASE_PATH into a list of documents.
 #       Use DirectoryLoader + TextLoader from langchain_community.document_loaders.
 #       Glob pattern should match markdown files only.
+#       Pass loader_kwargs={"encoding": "utf-8"} to DirectoryLoader so it
+#       works on Windows (default codepage is cp1251/cp1252, not UTF-8).
 #       Assign the result to a variable named `docs` — you'll use it in Step 2.
 
 

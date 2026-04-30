@@ -21,7 +21,7 @@ def get_file_content(path: str) -> str:
     if not full_path.exists():
         available = sorted(str(f.relative_to(REPO_PATH)) for f in REPO_PATH.rglob("*.py"))
         return f"Error: file '{path}' not found. Available files: {available}"
-    return full_path.read_text()
+    return full_path.read_text(encoding="utf-8", errors="replace")
 
 
 @tool
@@ -32,13 +32,18 @@ def search_codebase(query: str) -> str:
     Args:
         query: Search term — a function name, class name, keyword, or pattern
     """
-    result = subprocess.run(
-        ["grep", "-rn", query, str(REPO_PATH)],
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode == 0:
-        return result.stdout
+    matches = []
+    for f in REPO_PATH.rglob("*"):
+        if not f.is_file():
+            continue
+        try:
+            for i, line in enumerate(f.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+                if query in line:
+                    matches.append(f"{f}:{i}:{line}")
+        except OSError:
+            continue
+    if matches:
+        return "\n".join(matches)
     return f"No matches found for '{query}'"
 
 
@@ -55,6 +60,8 @@ def get_git_diff(commit_a: str, commit_b: str) -> str:
         ["git", "diff", commit_a, commit_b],
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         cwd=REPO_PATH.parent,
     )
     if not result.stdout.strip():

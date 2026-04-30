@@ -44,3 +44,23 @@ uv run python practice_day1/chat.py
 ```
 
 See [practice_day1/README.md](practice_day1/README.md) for the step-by-step task breakdown.
+
+## Windows users — one extra step
+
+The scripts print Unicode characters (`→`, `↔`, em-dashes). On Windows the
+default terminal codepage (cp1252 / cp866) can't encode them and you'll get
+`UnicodeEncodeError`. Enable Python's UTF-8 mode **before** running anything:
+
+```cmd
+:: cmd.exe (current session)
+set PYTHONUTF8=1
+
+:: PowerShell (current session)
+$env:PYTHONUTF8 = "1"
+
+:: Persist for all future sessions
+setx PYTHONUTF8 1
+```
+
+Also make sure `git` is installed and on `PATH` (Git for Windows does both).
+`uv` install on Windows: `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`.

@@ -18,7 +18,12 @@ if INDEX_PATH.exists():
     # allow_dangerous_deserialization=True: FAISS uses pickle; we trust our own index file
     vectorstore = FAISS.load_local(str(INDEX_PATH), embeddings, allow_dangerous_deserialization=True)
 else:
-    loader = DirectoryLoader(str(KNOWLEDGE_BASE_PATH), glob="*.md", loader_cls=TextLoader)
+    loader = DirectoryLoader(
+        str(KNOWLEDGE_BASE_PATH),
+        glob="*.md",
+        loader_cls=TextLoader,
+        loader_kwargs={"encoding": "utf-8"},
+    )
     docs = loader.load()
     splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     chunks = splitter.split_documents(docs)
